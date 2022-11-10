@@ -17,4 +17,3 @@ run2:
 
 clean:
 	rm $(FUENTE) lex.yy.c $(FUENTE).tab.c $(FUENTE).tab.h
-
