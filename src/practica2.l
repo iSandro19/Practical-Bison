@@ -2,13 +2,21 @@
 #include <stdlib.h>
 #include "practica2.tab.h"
 %}
-entero "-"?[0-9]+
-real "-"?[0-9]+"."[0-9]+
+
+%option yylineno
+
+cabecera "<?"[a-zA-Z0-9".""\-""=" ]+"?>"
+comentarios "<!--"[a-zA-Z0-9"\.""\-""=""/"":""_"",""!"áéíóú ]+"-->"
+datos "<"[a-zA-Z0-9]+">"[a-zA-Z0-9"\.""\-""=""/"":""_"",""!"áéíóú ]+"<""/"[a-zA-Z0-9]+">"
+inicio "<"[a-zA-Z0-9]+">"\n
+fin "</"[a-zA-Z0-9]+">"
+
 %%
-C {return CENTIGRADOS;}
-F {return FARENHEIT;}
-{entero} {yylval.valInt = atoi(yytext); return HORA;}
-{real} {yylval.valFloat = atof(yytext); return VALOR_TEMPERATURA;}
-. ;
-\n ;
+
+{cabecera} {return CABECERA;}
+{comentarios} {return COMENTARIOS;}
+{datos} {return DATOS;}
+{inicio} {yylval.val = strdup(yytext); return INICIO;}
+{fin} {return FIN;}
+
 %%

@@ -1,36 +1,59 @@
 %{
 #include <stdio.h>
-int numMedidas = 0;
+#include <string.h>
 
-void yyerror (char const *);
+void yyerror(char *s);
+char buffer[1024];
 %}
+%locations
 %union{
-	int valInt;
-	float valFloat;
+	char * val;
 }
-%token CENTIGRADOS FARENHEIT
-%token <valInt> HORA
-%token <valFloat> VALOR_TEMPERATURA
-%type <valFloat> temperatura medicion lista_temperaturas
-%start S
+%token CABECERA
+%token COMENTARIOS
+%token DATOS
+%token <val> INICIO
+%token <val> FIN
+
 %%
-S : lista_temperaturas {printf("Temperatura Media en Total: %f C\n",$1/(float)numMedidas);} 
+
+xml : CABECERA comentarios estructura {
+		printf("\nSintaxis XML correcta.\n");
+	}
+    ;
+comentarios : /*vacio*/
+	| COMENTARIOS
 	;
-lista_temperaturas : lista_temperaturas medicion {$$ = $1 + $2; numMedidas++;}
-	| medicion {$$ = $1; numMedidas++;}
+estructura : /*vacio*/
+	| INICIO estructura FIN {
+		if(strcmp($1, $3) != 0) {
+			char * str1 = $1;
+			char * str2 = $3;
+			str1[strlen(str1) - 1] = 0;
+			str2[strlen(str2) - 1] = 0;
+			snprintf(buffer, sizeof(buffer), "Encontrado \"%s\" y se esperaba \"%s\".", str1, str2);
+			yyerror(buffer); YYERROR;
+		}
+	}
+	| INICIO datos FIN estructura {
+		if(strcmp($1, $3) != 0) {
+			char * str1 = $1;
+			char * str2 = $3;
+			str1[strlen(str1) - 1] = 0;
+			str2[strlen(str2) - 1] = 0;
+			snprintf(buffer, sizeof(buffer), "Encontrado \"%s\" y se esperaba \"%s\".", str1, str2);
+			yyerror(buffer); YYERROR;
+		}
+	}
 	;
-medicion : HORA temperatura {if ($1 == 12) {
-				printf ("Temperatura a las 12H: %f C\n", $2);
-			}
-			$$ = $2;}
+datos : DATOS
+	| datos DATOS
 	;
-temperatura : VALOR_TEMPERATURA CENTIGRADOS {$$ = $1;}
-	| VALOR_TEMPERATURA FARENHEIT {$$ = (($1 - 32.0) * 5.0) / 9.0;}
-	;
+
 %%
+
 int main(int argc, char *argv[]) {
 extern FILE *yyin;
-
 	switch (argc) {
 		case 1:	yyin=stdin;
 			yyparse();
@@ -49,6 +72,6 @@ extern FILE *yyin;
 
 	return 0;
 }
-void yyerror (char const *message) { fprintf (stderr, "%s\n", message);}
 
-
+extern int yylineno;
+void yyerror(char *s) {fprintf (stderr, "\nSintaxis XML incorrecta en línea %d. %s", yylineno, s);}
