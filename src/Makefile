@@ -4,7 +4,7 @@ PRUEBA2 = test2.xml
 PRUEBA3 = test3.xml
 LIB = lfl
 
-all: compile run1 run2
+all: compile run1 run2 run3
 
 compile:
 	flex $(FUENTE).l

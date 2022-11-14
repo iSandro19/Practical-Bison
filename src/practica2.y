@@ -74,4 +74,4 @@ extern FILE *yyin;
 }
 
 extern int yylineno;
-void yyerror(char *s) {fprintf (stderr, "\nSintaxis XML incorrecta en línea %d. %s", yylineno, s);}
+void yyerror(char *s) {fprintf (stderr, "Sintaxis XML incorrecta en línea %d. %s\n", yylineno, s);}

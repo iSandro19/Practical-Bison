@@ -7,16 +7,17 @@
 
 cabecera "<?"[a-zA-Z0-9".""\-""=" ]+"?>"
 comentarios "<!--"[a-zA-Z0-9"\.""\-""=""/"":""_"",""!"áéíóú ]+"-->"
-datos "<"[a-zA-Z0-9]+">"[a-zA-Z0-9"\.""\-""=""/"":""_"",""!"áéíóú ]+"<""/"[a-zA-Z0-9]+">"
-inicio "<"[a-zA-Z0-9]+">"\n
 fin "</"[a-zA-Z0-9]+">"
+inicio "<"[a-zA-Z0-9]+">"
+datos [^<&\n ]+
 
 %%
 
 {cabecera} {return CABECERA;}
 {comentarios} {return COMENTARIOS;}
+{fin} {yylval.val = strdup(yytext+2); return FIN;}
+{inicio} {yylval.val = strdup(yytext+1); return INICIO;}
 {datos} {return DATOS;}
-{inicio} {yylval.val = strdup(yytext); return INICIO;}
-{fin} {return FIN;}
+\n {}
 
 %%
