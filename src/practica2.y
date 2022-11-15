@@ -14,40 +14,65 @@ char buffer[1024];
 %token DATOS
 %token <val> INICIO
 %token <val> FIN
+%token INVALIDO
 
 %%
 
-xml : CABECERA comentarios estructura {
-		printf("\nSintaxis XML correcta.\n");
+xml : cabecera comentarios estructura {
+		printf("Sintaxis XML correcta.\n\n");
 	}
     ;
+
+cabecera : /*vacio*/
+	| CABECERA
+	;
+
 comentarios : /*vacio*/
 	| COMENTARIOS
+	| INVALIDO  {
+		snprintf(buffer, sizeof(buffer), "Caracteres no válidos en XML (\"--\") en los comentarios");
+		yyerror(buffer); YYERROR;
+	}
 	;
+
 estructura : /*vacio*/
 	| INICIO estructura FIN {
+		char * str1 = $1;
+		char * str2 = $3;
+		str1[strlen(str1) - 1] = 0;
+		str2[strlen(str2) - 1] = 0;
+
 		if(strcmp($1, $3) != 0) {
-			char * str1 = $1;
-			char * str2 = $3;
-			str1[strlen(str1) - 1] = 0;
-			str2[strlen(str2) - 1] = 0;
-			snprintf(buffer, sizeof(buffer), "Encontrado \"%s\" y se esperaba \"%s\".", str1, str2);
+			snprintf(buffer, sizeof(buffer), "Encontrado \"%s\" y se esperaba \"%s\".", str2, str1);
 			yyerror(buffer); YYERROR;
 		}
 	}
 	| INICIO datos FIN estructura {
+		char * str1 = $1;
+		char * str2 = $3;
+		str1[strlen(str1) - 1] = 0;
+		str2[strlen(str2) - 1] = 0;
+		
 		if(strcmp($1, $3) != 0) {
-			char * str1 = $1;
-			char * str2 = $3;
-			str1[strlen(str1) - 1] = 0;
-			str2[strlen(str2) - 1] = 0;
-			snprintf(buffer, sizeof(buffer), "Encontrado \"%s\" y se esperaba \"%s\".", str1, str2);
+			snprintf(buffer, sizeof(buffer), "Encontrado \"%s\" y se esperaba \"%s\".", str2, str1);
 			yyerror(buffer); YYERROR;
 		}
 	}
+	| INICIO datos INICIO {
+		char * str1 = $1;
+		str1[strlen(str1) - 1] = 0;
+
+		snprintf(buffer, sizeof(buffer), "Tag de cierre no encontrado para tag de inicio \"%s\".", str1);
+		yyerror(buffer); YYERROR;
+	}
 	;
+	
 datos : DATOS
 	| datos DATOS
+	| datos INVALIDO {
+		snprintf(buffer, sizeof(buffer), "Caracteres no válidos en XML (\"<\" o \"&\") en los datos");
+		yyerror(buffer); YYERROR;
+	}
 	;
 
 %%
@@ -74,4 +99,4 @@ extern FILE *yyin;
 }
 
 extern int yylineno;
-void yyerror(char *s) {fprintf (stderr, "Sintaxis XML incorrecta en línea %d. %s\n", yylineno, s);}
+void yyerror(char *s) {fprintf (stderr, "Sintaxis XML incorrecta en línea %d. %s\n\n", yylineno, s);}
