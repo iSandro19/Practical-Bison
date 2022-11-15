@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Comprobamos que no existen caracteres inválidos en los datos -->
+<nota>
+    <id>1</id>
+    <titulo>PL < Importante</titulo>
+</nota>
