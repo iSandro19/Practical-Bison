@@ -18,13 +18,17 @@ char buffer[1024];
 
 %%
 
-xml : cabecera comentarios estructura {
+xml : comentarios raiz {
+        snprintf(buffer, sizeof(buffer), "Todo archivo de XML debe tener una cabecera (XML prolog).");
+		yyerror(buffer); YYERROR;
+	}
+	| cabecera comentarios raiz {
 		printf("Sintaxis XML correcta.\n\n");
 	}
     ;
 
-cabecera : /*vacio*/
-	| CABECERA
+cabecera : CABECERA
+	| cabecera CABECERA
 	;
 
 comentarios : /*vacio*/
@@ -35,8 +39,25 @@ comentarios : /*vacio*/
 	}
 	;
 
+raiz : INICIO estructura FIN {
+		char * str1 = $1;
+		char * str2 = $3;
+		str1[strlen(str1) - 1] = 0;
+		str2[strlen(str2) - 1] = 0;
+
+		if(strcmp($1, $3) != 0) {
+			snprintf(buffer, sizeof(buffer), "Encontrado \"%s\" y se esperaba \"%s\".", str2, str1);
+			yyerror(buffer); YYERROR;
+		}
+	}
+	| INICIO estructura FIN estructura {
+		snprintf(buffer, sizeof(buffer), "Un documento XML solo puede tener 1 elemento raíz");
+		yyerror(buffer); YYERROR;
+	}
+	;
+
 estructura : /*vacio*/
-	| INICIO estructura FIN {
+	| INICIO estructura FIN estructura {
 		char * str1 = $1;
 		char * str2 = $3;
 		str1[strlen(str1) - 1] = 0;

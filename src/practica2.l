@@ -7,8 +7,8 @@
 
 cabecera "<?"[a-zA-Z0-9.\-=" ]+"?>"
 comentarios "<!--"[a-zA-Z0-9"\.=/:_,!áéíóú ]+"-->"
-fin "</"[a-zA-Z0-9:"= ]+">"
-inicio "<"[a-zA-Z0-9:"= ]+">"
+fin "</"[a-zA-Z0-9:"=._\- ]+">"
+inicio "<"[a-zA-Z0-9:"=._\- ]+">"
 datos [^><\n\t\r ]+
 invalido [&<]+
 
