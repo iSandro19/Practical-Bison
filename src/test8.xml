@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Comprobamos que solo puede haber 1 tag raíz -->
+<CD>
+    <TITLE>Empire Burlesque</TITLE>
+    <CD>
+        <TITLE>Empire Burlesque</TITLE>
+    </CD>
+</CD>
+<CD>
+    <CD>
+        <TITLE>Empire Burlesque</TITLE>
+    </CD>
+</CD>
+<CD>
+    <CD>
+        <TITLE>Empire Burlesque</TITLE>
+    </CD>
+</CD>
